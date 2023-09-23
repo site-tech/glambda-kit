@@ -2,7 +2,11 @@ package main
 
 import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
-	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+
+	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
+	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
+	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
@@ -18,12 +22,26 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	// The code that defines your stack goes here
+	// hello Lambda function
+	getHelloHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("hello"), &awscdklambdagoalpha.GoFunctionProps{
+		Runtime: awslambda.Runtime_GO_1_X(),
+		Entry:   jsii.String("./lambda/hello"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: jsii.Strings(`-ldflags "-s -w"`),
+		},
+	})
 
-	// example resource
-	// queue := awssqs.NewQueue(stack, jsii.String("GlambdaKitQueue"), &awssqs.QueueProps{
-	// 	VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
-	// })
+	// create HTTP API Gateway
+	httpApiGateway := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("glambda-api"), &awscdkapigatewayv2alpha.HttpApiProps{
+		ApiName: jsii.String("glambda-api"),
+	})
+
+	// add route to HTTP API Gateway
+	httpApiGateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/hello"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getHelloHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
 
 	return stack
 }
