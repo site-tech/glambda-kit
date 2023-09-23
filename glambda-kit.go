@@ -32,10 +32,17 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 	})
 
 	// NodeJS Andy Lambda function
-	getAndyHandler := awslambda.NewFunction(stack, jsii.String("andy"), &awslambda.FunctionProps{
+	getAndyHandler := awslambda.NewFunction(stack, jsii.String("node"), &awslambda.FunctionProps{
 		Runtime: awslambda.Runtime_NODEJS_18_X(),
 		Handler: jsii.String("index.main"),
-		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/andy/"), nil),
+		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/node/"), nil),
+	})
+
+	// Python 3 Lambda function
+	getPythonHanlder := awslambda.NewFunction(stack, jsii.String("PythonLambda"), &awslambda.FunctionProps{
+		Runtime: awslambda.Runtime_PYTHON_3_9(),
+		Handler: jsii.String("index.handler"),
+		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/python"), nil),
 	})
 
 	// create HTTP API Gateway
@@ -52,9 +59,16 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 
 	// add NodeJS Andy route to HTTP API Gateway
 	httpApiGateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/andy"),
+		Path:        jsii.String("/node"),
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getAndyHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// add Python route to HTTP API Gateway
+	httpApiGateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/python"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getPythonHanlder, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	return stack
