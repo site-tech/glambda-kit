@@ -1,0 +1,39 @@
+Resources:
+  GetHelloHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./lambda/hello
+      Handler: index.handler
+      Runtime: go1.x
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+  GetAndyHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./lambda/node
+      Handler: index.main
+      Runtime: nodejs18.x
+      Events:
+        NodeAndy:
+          Type: Api
+          Properties:
+            Path: /node
+            Method: get
+
+  GetPythonHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./lambda/python
+      Handler: index.handler
+      Runtime: python3.9
+      Events:
+        PythonRoute:
+          Type: Api
+          Properties:
+            Path: /python
+            Method: get

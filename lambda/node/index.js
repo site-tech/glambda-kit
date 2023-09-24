@@ -1,7 +1,7 @@
 const main = async function(event) {
   try {
     const response = {
-      message: "Hello World!",
+      message: "Hello World!!",
     };
     return {
       statusCode: 200,
