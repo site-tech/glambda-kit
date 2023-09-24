@@ -1,8 +1,12 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+	"github.com/subosito/gotenv"
 
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
@@ -10,6 +14,12 @@ import (
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
+
+func init() {
+	if err := gotenv.Load(); err != nil {
+		log.Println("no .env file")
+	}
+}
 
 type GlambdaKitStackProps struct {
 	awscdk.StackProps
@@ -31,6 +41,23 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 		},
 	})
 
+	// Create Square Booking POST lambda
+	createSquareBooking := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("createSquareBooking"), &awscdklambdagoalpha.GoFunctionProps{
+		Runtime: awslambda.Runtime_GO_1_X(),
+		Entry:   jsii.String("./lambda/squareApi/createBooking"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: jsii.Strings(`-ldflags "-s -w"`),
+		},
+		Environment: &map[string]*string{
+			"SQUARE_API_KEY":            jsii.String(os.Getenv("SQUARE_API_KEY")),
+			"SERVICE_VARIATION_VERSION": jsii.String(os.Getenv("SERVICE_VARIATION_VERSION")),
+			"SERVICE_VARIATION_ID":      jsii.String(os.Getenv("SERVICE_VARIATION_ID")),
+			"TEAM_MEMBER_ID":            jsii.String(os.Getenv("TEAM_MEMBER_ID")),
+			"CUSTOMER_ID":               jsii.String(os.Getenv("CUSTOMER_ID")),
+			"LOCATION_ID":               jsii.String(os.Getenv("LOCATION_ID")),
+		},
+	})
+
 	// NodeJS Andy Lambda function
 	getAndyHandler := awslambda.NewFunction(stack, jsii.String("node"), &awslambda.FunctionProps{
 		Runtime: awslambda.Runtime_NODEJS_18_X(),
@@ -48,6 +75,13 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 	// create HTTP API Gateway
 	httpApiGateway := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("glambda-api"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("glambda-api"),
+	})
+
+	// add Square Create Booking Lambda
+	httpApiGateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/create/booking"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), createSquareBooking, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// add hello route to HTTP API Gateway
