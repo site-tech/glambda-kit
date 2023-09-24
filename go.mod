@@ -9,6 +9,7 @@ require (
 	github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2 v2.97.0-alpha.0
 	github.com/aws/constructs-go/constructs/v10 v10.2.70
 	github.com/aws/jsii-runtime-go v1.88.0
+	github.com/subosito/gotenv v1.6.0
 )
 
 require (
@@ -23,5 +24,6 @@ require (
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
 )

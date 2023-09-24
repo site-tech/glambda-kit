@@ -1,3 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: An example AWS SAM template that creates a Lambda application.
+
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  SquareApiKey:
+    Type: String
+    Description: Square API Key
+  ServiceVariationVersion:
+    Type: String
+    Description: Service Variation Version
+  ServiceVariationId:
+    Type: String
+    Description: Service Variation ID
+  TeamMemberId:
+    Type: String
+    Description: Team Member ID
+  CustomerId:
+    Type: String
+    Description: Customer ID
+  LocationId:
+    Type: String
+    Description: Location ID
+
 Resources:
   GetHelloHandler:
     Type: AWS::Serverless::Function
@@ -11,6 +39,33 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+
+  CreateSquareBookingHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./lambda/squareApi/createBooking
+      Handler: index.handler
+      Runtime: go1.x
+      Environment:
+        Variables:
+          SQUARE_API_KEY:
+            Fn::Ref: SquareApiKey
+          SERVICE_VARIATION_VERSION:
+            Fn::Ref: ServiceVariationVersion
+          SERVICE_VARIATION_ID:
+            Fn::Ref: ServiceVariationId
+          TEAM_MEMBER_ID:
+            Fn::Ref: TeamMemberId
+          CUSTOMER_ID:
+            Fn::Ref: CustomerId
+          LOCATION_ID:
+            Fn::Ref: LocationId
+      Events:
+        CreateSquareBooking:
+          Type: Api
+          Properties:
+            Path: /create/booking
+            Method: post
 
   GetAndyHandler:
     Type: AWS::Serverless::Function
