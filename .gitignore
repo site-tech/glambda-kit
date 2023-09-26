@@ -20,4 +20,9 @@ cdk.out
 **/node_modules
 **/.env
 **/env.json
+**/.env.json
 .aws-sam
+
+# Ignore dependencies and Lambda layers
+pythonDep
+deployment_package.zip

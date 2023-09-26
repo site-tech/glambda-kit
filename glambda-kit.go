@@ -32,6 +32,10 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
+	layer := awslambda.NewLayerVersion(stack, jsii.String("MyLayer"), &awslambda.LayerVersionProps{
+		Code: awslambda.Code_FromAsset(jsii.String("./lambda/python/deployment_package.zip"), nil),
+	})
+
 	// hello Lambda function
 	getHelloHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("hello"), &awscdklambdagoalpha.GoFunctionProps{
 		Runtime: awslambda.Runtime_GO_1_X(),
@@ -70,6 +74,11 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 		Runtime: awslambda.Runtime_PYTHON_3_9(),
 		Handler: jsii.String("index.handler"),
 		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/python"), nil),
+		Layers:  &[]awslambda.ILayerVersion{layer},
+		Environment: &map[string]*string{
+			"VERTEX_JSON": jsii.String(os.Getenv("VERTEX_JSON")),
+		},
+		Timeout: awscdk.Duration_Seconds(jsii.Number(30)),
 	})
 
 	// create HTTP API Gateway

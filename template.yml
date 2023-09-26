@@ -25,6 +25,9 @@ Parameters:
   LocationId:
     Type: String
     Description: Location ID
+  VertexJson:
+    Type: String
+    Description: Vertex JSON
 
 Resources:
   GetHelloHandler:
@@ -86,6 +89,10 @@ Resources:
       CodeUri: ./lambda/python
       Handler: index.handler
       Runtime: python3.9
+      Environment:
+        Variables:
+          VERTEX_JSON:
+            Fn::Ref: VertexJson
       Events:
         PythonRoute:
           Type: Api
