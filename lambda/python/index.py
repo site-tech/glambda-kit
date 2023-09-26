@@ -26,13 +26,30 @@ def handler(event, context):
             "top_p": 0.8,
             "top_k": 40
         }
+
+        if 'body' in event:
+            json_body = json.loads(event['body'])
+        else:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Missing JSON body'})
+            }
+
+        if 'prompt' in json_body:
+            prompt_value = json_body['prompt']
+        else:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Key "prompt" not found in JSON body'})
+            }
+
+
         chat = chat_model.start_chat(
             context="""After giving an itinerary of where to eat at, offer to make a reservation at those restaurants.  Make sure to ask if they want you to make a reservation at every restaurant that is confirmed the user wants to try.""",
         )
 
-        response = chat.send_message("""Give me a list of restaurants to try out on my 2 day trip to indianapolis""", **parameters)
-    
-        response = chat.send_message("""Yes at the rathskeller and slippery noodle""", **parameters)
+        response = chat.send_message(prompt_value, **parameters)
+
         
         return {
             'statusCode': 200,
