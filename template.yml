@@ -30,23 +30,23 @@ Parameters:
     Description: Vertex JSON
 
 Resources:
-  GetHelloHandler:
+  GoHello:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./lambda/hello
+      CodeUri: ./lambda/golang/hello
       Handler: index.handler
       Runtime: go1.x
       Events:
         HelloWorld:
           Type: Api
           Properties:
-            Path: /hello
+            Path: /golang/hello
             Method: get
 
-  CreateSquareBookingHandler:
+  CreateSquareBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./lambda/squareApi/createBooking
+      CodeUri: ./lambda/golang/squareApi/createBooking
       Handler: index.handler
       Runtime: go1.x
       Environment:
@@ -70,23 +70,23 @@ Resources:
             Path: /create/booking
             Method: post
 
-  GetAndyHandler:
+  NodeHello:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./lambda/node
+      CodeUri: ./lambda/node/hello
       Handler: index.main
       Runtime: nodejs18.x
       Events:
         NodeAndy:
           Type: Api
           Properties:
-            Path: /node
+            Path: /node/hello
             Method: get
 
-  GetPythonHandler:
+  GVertextAI:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./lambda/python
+      CodeUri: ./lambda/python/googleAI/vertex
       Handler: index.handler
       Runtime: python3.9
       Timeout: 30
@@ -98,5 +98,5 @@ Resources:
         PythonRoute:
           Type: Api
           Properties:
-            Path: /python
+            Path: /ai/vertex
             Method: get
