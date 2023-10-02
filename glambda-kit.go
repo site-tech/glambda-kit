@@ -39,30 +39,34 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 
 	// add Square Create Booking Lambda
 	gateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/create/booking"),
-		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), postCreateBookingHandler(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Path:    jsii.String("/create/booking"),
+		Methods: &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"),
+			postCreateBookingHandler(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// add hello route to HTTP API Gateway
 	gateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/golang/hello"),
-		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getGoHelloHandler(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Path:    jsii.String("/golang/hello"),
+		Methods: &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"),
+			getGoHelloHandler(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// add NodeJS Andy route to HTTP API Gateway
 	gateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/node/hello"),
-		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getNodeHelloHanlder(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Path:    jsii.String("/node/hello"),
+		Methods: &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"),
+			getNodeHelloHanlder(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// add Python route to HTTP API Gateway
 	gateway.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/ai/vertex"),
-		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), postGoogleAIVertexHanlder(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Path:    jsii.String("/ai/vertex"),
+		Methods: &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"),
+			postGoogleAIVertexHanlder(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	return stack
@@ -110,13 +114,13 @@ func getNodeHelloHanlder(stack awscdk.Stack) awslambda.Function {
 
 // Python 3 Lambda function
 func postGoogleAIVertexHanlder(stack awscdk.Stack) awslambda.Function {
-	layer := awslambda.NewLayerVersion(stack, jsii.String("MyLayer"), &awslambda.LayerVersionProps{
+	layer := awslambda.NewLayerVersion(stack, jsii.String("pythonLayer"), &awslambda.LayerVersionProps{
 		Code: awslambda.Code_FromAsset(jsii.String("./lambda/python/googleAI/vertex/deployment_package.zip"), nil),
 	})
 	return awslambda.NewFunction(stack, jsii.String("GVertextAI"), &awslambda.FunctionProps{
 		Runtime: awslambda.Runtime_PYTHON_3_9(),
 		Handler: jsii.String("index.handler"),
-		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/python/googleAI/vertex"), nil),
+		Code:    awslambda.Code_FromAsset(jsii.String("./lambda/python/googleAI/vertex/"), nil),
 		Layers:  &[]awslambda.ILayerVersion{layer},
 		Environment: &map[string]*string{
 			"VERTEX_JSON": jsii.String(os.Getenv("VERTEX_JSON")),
