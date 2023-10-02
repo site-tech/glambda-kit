@@ -89,6 +89,7 @@ Resources:
       CodeUri: ./lambda/python
       Handler: index.handler
       Runtime: python3.9
+      Timeout: 30
       Environment:
         Variables:
           VERTEX_JSON:
