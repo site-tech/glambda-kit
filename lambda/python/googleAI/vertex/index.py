@@ -8,7 +8,10 @@ from google.oauth2 import service_account
 
 def handler(event, context):
     try:
+        # WHEN RUNNING LOCALLY, MAKE SURE TO ADD THE ENV FILE PARAMETER ON LIKE SO:
+        # sam local start-api  --env-vars .env.json
         encoded_credentials_json = os.environ.get('VERTEX_JSON')
+
         credentials_json = base64.b64decode(
             encoded_credentials_json).decode('utf-8')
 

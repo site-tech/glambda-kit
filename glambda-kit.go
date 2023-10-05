@@ -32,6 +32,10 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
+	pythonLayer := awslambda.NewLayerVersion(stack, jsii.String("pythonLayer"), &awslambda.LayerVersionProps{
+		Code: awslambda.Code_FromAsset(jsii.String("./lambda/python/deployment_package.zip"), nil),
+	})
+
 	// create HTTP API Gateway
 	gateway := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("glambda-api"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("glambda-api"),
@@ -66,7 +70,7 @@ func NewGlambdaKitStack(scope constructs.Construct, id string, props *GlambdaKit
 		Path:    jsii.String("/ai/vertex"),
 		Methods: &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"),
-			postGoogleAIVertexHanlder(stack), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+			postGoogleAIVertexHanlder(stack, pythonLayer), &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	return stack
@@ -113,10 +117,8 @@ func getNodeHelloHanlder(stack awscdk.Stack) awslambda.Function {
 }
 
 // Python 3 Lambda function
-func postGoogleAIVertexHanlder(stack awscdk.Stack) awslambda.Function {
-	layer := awslambda.NewLayerVersion(stack, jsii.String("pythonLayer"), &awslambda.LayerVersionProps{
-		Code: awslambda.Code_FromAsset(jsii.String("./lambda/python/googleAI/vertex/deployment_package.zip"), nil),
-	})
+func postGoogleAIVertexHanlder(stack awscdk.Stack, layer awslambda.ILayerVersion) awslambda.Function {
+
 	return awslambda.NewFunction(stack, jsii.String("GVertextAI"), &awslambda.FunctionProps{
 		Runtime: awslambda.Runtime_PYTHON_3_9(),
 		Handler: jsii.String("index.handler"),
