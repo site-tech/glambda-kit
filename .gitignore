@@ -26,3 +26,5 @@ cdk.out
 # Ignore dependencies and Lambda layers
 pythonDep
 deployment_package.zip
+.DS_Store
+**/venv
