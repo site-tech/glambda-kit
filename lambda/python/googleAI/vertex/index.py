@@ -32,9 +32,13 @@ def handler(event, context):
             "top_k": 40
         }
 
-        if 'body' in event:
+        if 'body' in event and isinstance(event.get('body'), str):
             json_body = json.loads(event['body'])
+        elif 'body' in event and isinstance(event.get('body'), object):
+            json_body = event['body']
         else:
+            print('Event: ', event)
+
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'Missing JSON body'})
@@ -43,13 +47,43 @@ def handler(event, context):
         if 'prompt' in json_body:
             prompt_value = json_body['prompt']
         else:
+            print('Event: ', event)
+
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'Key "prompt" not found in JSON body'})
             }
 
+        # chat = chat_model.start_chat(
+        #     context="""After giving an itinerary of where to eat at, offer to make a reservation at those restaurants.  Make sure to ask if they want you to make a reservation at every restaurant that is confirmed the user wants to try.""",
+        # )
+
         chat = chat_model.start_chat(
-            context="""After giving an itinerary of where to eat at, offer to make a reservation at those restaurants.  Make sure to ask if they want you to make a reservation at every restaurant that is confirmed the user wants to try.""",
+            context="""You are a personal assistant helping the user book a reservation at a restaurant. Ask the user questions to find out what restaurant is the best fit for their needs. Your goal is to guide the user to book a reservation at the restaurant of their choosing. The user will provide criteria as listed below:
+
+            User Criteria: location, type of food, time, date
+
+            User can add other criteria as needed. 
+
+            Always prioritize the criteria based on the order in which the user brings them up in conversation. 
+
+            When you are sending back a list of recommended restaurants, always preface with "Here are your top picks from Google!".
+
+            After sending back a list of restaurants, ask if the user would like you to make a reservation.  Mention that you can make a reservation at Goodfellas powered by Square technologies.
+
+            The list should show 3 options of restaurants by default; always make sure one of the three options is Goodfellas Pizzaria.
+
+            Always display the hours of operations when listing restaurants for the user. 
+
+            Do not ask the user if they want to see a list that meets the criteria, just show the list of restaurants.
+
+            Do not preface your follow up questions with a sentence confirming what was told to you by the user in the last message.
+
+            When the user is making a reservation, the following criteria are required:
+
+            Reservation Criteria: Name, time, date
+
+            If the user requests to make a reservation at a restaurant, accept their request and respond by reiterating the gathered criteria so far in the conversation. If there is any criteria that the user has not provided, ask for it at this time. Once all criteria have been met, show the information one more time in a message, and ask the user to confirm this reservation.""",
         )
 
         response = chat.send_message(prompt_value, **parameters)
