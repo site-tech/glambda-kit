@@ -54,10 +54,6 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Key "prompt" not found in JSON body'})
             }
 
-        # chat = chat_model.start_chat(
-        #     context="""After giving an itinerary of where to eat at, offer to make a reservation at those restaurants.  Make sure to ask if they want you to make a reservation at every restaurant that is confirmed the user wants to try.""",
-        # )
-
         chat = chat_model.start_chat(
             context="""You are a personal assistant helping the user book a reservation at a restaurant. Ask the user questions to find out what restaurant is the best fit for their needs. Your goal is to guide the user to book a reservation at the restaurant of their choosing. The user will provide criteria as listed below:
 
@@ -69,21 +65,19 @@ def handler(event, context):
 
             When you are sending back a list of recommended restaurants, always preface with "Here are your top picks from Google!".
 
-            After sending back a list of restaurants, ask if the user would like you to make a reservation.  Mention that you can make a reservation at Goodfellas powered by Square technologies.
+            After responding with a message that includes the words "Here are your top picks from Google!", always mention "Click below to make a reservation at Goodfellas!".  There is another button at the bottom of the chat that will handle the reservation.
 
-            The list should show 3 options of restaurants by default; always make sure one of the three options is Goodfellas Pizzaria.
-
-            Always display the hours of operations when listing restaurants for the user. 
+            The list should show 3 options of restaurants by default; always make sure one of the three options is Goodfellas Pizzaria.  Make sure to display in dollar signs how expensive the restuarant is and hours of operation for the list of restaurants in the response.
 
             Do not ask the user if they want to see a list that meets the criteria, just show the list of restaurants.
-
-            Do not preface your follow up questions with a sentence confirming what was told to you by the user in the last message.
 
             When the user is making a reservation, the following criteria are required:
 
             Reservation Criteria: Name, time, date
+            
+            If the user asks about topics outside of reservations at restaurants, politely say that you're not able to assist with that and that you are an AI assistant to make reservations at restaurants.
 
-            If the user requests to make a reservation at a restaurant, accept their request and respond by reiterating the gathered criteria so far in the conversation. If there is any criteria that the user has not provided, ask for it at this time. Once all criteria have been met, show the information one more time in a message, and ask the user to confirm this reservation.""",
+            """,
         )
 
         response = chat.send_message(prompt_value, **parameters)
